@@ -94,8 +94,6 @@ function filterRepos(repoArr){
 			data.forEach((repo) => {
 				if(repo){
 					console.log('Found repo '+repo.full_name);
-
-
 				}
 			});
 		});
@@ -111,10 +109,18 @@ function filterRepos(repoArr){
 * Here's the module to get and analyze the README
 */
 
-function readMe(){
-	
+function readMe(repos,cb){
+	grabReadMes(repos).then(function(){
+
+	});
+
 }
 
+function grabReadMes(repos){
+
+
+	
+}
 
 
 
@@ -138,12 +144,13 @@ function readMe(){
 			_findRepo.next().then((repos) => {
 				filterRepos(repos).then((fRepos) => {
 					readMe(fRepos,() => {
-
+						console.log('Finished eating a batch of repos, yum');
+						_finding = false;
 					});
 				});
 			});
 		}
 
-	},60000);
+	},120000);
 
 })();
