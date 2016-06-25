@@ -19,11 +19,11 @@ var ON_DEATH = require('DEATH');
 */
 var REPOS_WITH_BAD_SPELLINGS = [];
 
-//Since ^ is the most important thing
-
+//Since ^ is the most important thing we gotta keep it on death
 ON_DEATH(function(){
 
-	fs.writeFileSync('./data.dat',REPOS_WITH_BAD_SPELLINGS);
+	fs.writeFileSync('./savedRepos.json',JSON.stringify(REPOS_WITH_BAD_SPELLINGS));
+
 });
 
 
@@ -76,9 +76,11 @@ function filterRepos(repoArr){
 
 			$.get({
 				url: 'https://api.github.com/repos/' + repo.full_name,
-				function(repo){
+				done: function(repo){
 					if(repo.stargazers_count > 20){
 						cb(null,repo);
+					}else{
+						cb(null,undefined);
 					}
 				}
 			});
@@ -88,8 +90,14 @@ function filterRepos(repoArr){
 
 
 	return new Promise(function(resolve,reject){
-		async.parallel(function(err,cb){
+		async.parallel(_cbArr,function(err,data){
+			data.forEach(function(repo){
+				if(repo){
+					console.log('Found repo '+repo.full_name);
 
+					
+				}
+			});
 		});
 
 
