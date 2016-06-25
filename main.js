@@ -127,20 +127,32 @@ function grabReadMes(repos){
 	//Damn, we need to use async with a callback array
 	var _cbArr = [];
 
-	return new Promise(function(resolve,reject){
+	//push each readme fetching function into the callback array
 
-
-		repos.forEach((repo) => {
-
+	repos.forEach((repo) => {
+		_cbArr.push((cb) => {
 
 			//Grab the readMe
 			$.get({
 				url: 'https://raw.githubusercontent.com/'+repo.full_name+'/master/README.md',
 				json: false,
-				done: (readMe) => {
-					resolve();
+				done: (readme) => {
+					//return the readme data
+					cb({
+						readme: readme,
+						repo: repo
+					});
 				}
 			});
+
+		});
+
+	});
+
+	return new Promise(function(resolve,reject){
+		async.parallel(_cbArr,function(err,data){
+			resolve(data);
+
 		});
 	});
 
