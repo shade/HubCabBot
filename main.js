@@ -29,6 +29,7 @@ ON_DEATH(() => {
 
 	fs.writeFileSync('./savedRepos.json',JSON.stringify(REPOS_WITH_BAD_SPELLINGS));
 
+
 });
 
 
@@ -117,6 +118,7 @@ function filterRepos(repoArr){
 function readMe(repos,cb){
 	grabReadMes(repos).then(function(fRepos_withReadMes){
 		//Analyze READMEs here as well
+		REPOS_WITH_BAD_SPELLINGS.push(fRepos_withReadMes);
 		cb();
 	});
 
@@ -152,7 +154,6 @@ function grabReadMes(repos){
 	return new Promise(function(resolve,reject){
 		async.parallel(_cbArr,function(err,data){
 			resolve(data);
-
 		});
 	});
 
