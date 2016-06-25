@@ -20,7 +20,7 @@ var ON_DEATH = require('DEATH');
 var REPOS_WITH_BAD_SPELLINGS = [];
 
 //Since ^ is the most important thing we gotta keep it on death
-ON_DEATH(function(){
+ON_DEATH(() => {
 
 	fs.writeFileSync('./savedRepos.json',JSON.stringify(REPOS_WITH_BAD_SPELLINGS));
 
@@ -39,17 +39,17 @@ function* fetchRepos(){
 	//Yield a new promise for fetching the repos
 	while(true){
 
-		yield new Promise(function(resolve,reject){
+		yield new Promise((resolve,reject) => {
 
 			$.get({
 				url: 'https://api.github.com/repositories?since='+_ptr,
 				json: true,
-				done: function(repos){
+				done: (repos) => {
 					//Set the pointer to the new latest value
 					_ptr = repos[repos.length - 1].id;
 					resolve(repos);
 				},
-				error: function(){
+				error: () => {
 					reject();
 				}
 			});
@@ -69,14 +69,14 @@ function filterRepos(repoArr){
 	//Here's where we're gonna push in the repos to check for stars
 	var _cbArr = [];
 
-	repoArr.forEach(function(repo){
+	repoArr.forEach((repo) => {
 
 		//OoOoOo we're pushing in a function, JS is so cool
-		_cbArr.push(function(cb){
+		_cbArr.push((cb) => {
 
 			$.get({
 				url: 'https://api.github.com/repos/' + repo.full_name,
-				done: function(repo){
+				done: (repo) => {
 					if(repo.stargazers_count > 20){
 						cb(null,repo);
 					}else{
@@ -89,13 +89,13 @@ function filterRepos(repoArr){
 	});
 
 
-	return new Promise(function(resolve,reject){
-		async.parallel(_cbArr,function(err,data){
-			data.forEach(function(repo){
+	return new Promise((resolve,reject) => {
+		async.parallel(_cbArr,(err,data) => {
+			data.forEach((repo) => {
 				if(repo){
 					console.log('Found repo '+repo.full_name);
 
-					
+
 				}
 			});
 		});
@@ -104,6 +104,15 @@ function filterRepos(repoArr){
 	});
 
 
+}
+
+
+/*
+* Here's the module to get and analyze the README
+*/
+
+function readMe(){
+	
 }
 
 
@@ -118,7 +127,7 @@ function filterRepos(repoArr){
 	var _finding = false;
 
 	//Repeats once every minute
-	setInterval(function(){
+	setInterval(() => {
 
 		//Maybe a goto would be better than this whole setInterval + validation thing
 		if(!_finding){
@@ -126,11 +135,11 @@ function filterRepos(repoArr){
 			console.log('Eating some repos ᗧ • • • • • • • ');
 			_finding = true;
 
-			_findRepo.next().then(function(repos){
-				filterRepos(repos).then(function(fRepos){
-					fRepos
+			_findRepo.next().then((repos) => {
+				filterRepos(repos).then((fRepos) => {
+					readMe(fRepos,() => {
 
-					_finding = false;
+					});
 				});
 			});
 		}
