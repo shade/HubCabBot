@@ -1,12 +1,14 @@
 var request	=	require('request');
 function get(e,i){
 	i = i||1;
+	//gotta get rid of this later
 	//Get rid of the self signed error 
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 	request({
 		url:e.url,
 		headers: {
-			'User-Agent': 'HUB Robot'
+			'User-Agent': 'HUB Robot',
+			'Authorization': 'token cbd4b615c60d0f4d29892b088e4bfe9e36334c2f'
 		}
 	}, function(error, response, body) {
 		if (response==undefined || error || response.statusCode !== 200) {
