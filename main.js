@@ -1,9 +1,7 @@
 var fs = require('fs');
-var Git = require('nodegit');
-var SpellCheck = require('spellchecker');
 var Async = require('async');
 var ON_DEATH = require('DEATH');
-
+var $ = require('./Ajax');
 /*
 	* Fetch as many github repos as possible
 	* Sort by starred, get anything >20 stars (small repos tend to get removed)
@@ -176,10 +174,11 @@ function grabReadMes(repos){
 		//Maybe a goto would be better than this whole setInterval + validation thing
 		if(!_finding){
 			
-			console.log('Eating some repos ᗧ • • • • • • • ');
+			console.log('Eating some repos ... ');
 			_finding = true;
 
-			_findRepo.next().then((repos) => {
+			//Generate a repo promise, filter and grab the readme from that 
+			_findRepo.next().value.then((repos) => {
 				filterRepos(repos).then((fRepos) => {
 					readMe(fRepos,() => {
 						console.log('Finished eating a batch of repos, yum');

@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/joe-tom/HubCabBot/issues"
   },
-  "homepage": "https://github.com/joe-tom/HubCabBot#readme"
+  "homepage": "https://github.com/joe-tom/HubCabBot#readme",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "death": "^1.0.0"
+  }
 }
