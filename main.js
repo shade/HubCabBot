@@ -15,7 +15,12 @@ var ON_DEATH = require('DEATH');
 
 
 /*
-* All the repos that have readmes with bad spelling are pushed heres
+* All the repos that have readmes with bad spelling are pushed here as objects
+* {
+	  readme: 'read me data here rawly',
+	  repo: {{GITHUB REPO OBJECT}}
+  }
+*
 */
 var REPOS_WITH_BAD_SPELLINGS = [];
 
@@ -110,16 +115,36 @@ function filterRepos(repoArr){
 */
 
 function readMe(repos,cb){
-	grabReadMes(repos).then(function(){
-
+	grabReadMes(repos).then(function(fRepos_withReadMes){
+		//Analyze READMEs here as well
+		cb();
 	});
 
 }
 
 function grabReadMes(repos){
 
+	//Damn, we need to use async with a callback array
+	var _cbArr = [];
 
-	
+	return new Promise(function(resolve,reject){
+
+
+		repos.forEach((repo) => {
+
+
+			//Grab the readMe
+			$.get({
+				url: 'https://raw.githubusercontent.com/'+repo.full_name+'/master/README.md',
+				json: false,
+				done: (readMe) => {
+					resolve();
+				}
+			});
+		});
+	});
+
+
 }
 
 
