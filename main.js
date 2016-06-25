@@ -25,9 +25,7 @@ var REPOS_WITH_BAD_SPELLINGS = [];
 //Since ^ is the most important thing we gotta keep it on death
 ON_DEATH(() => {
 
-	fs.writeFileSync('./savedRepos.json',JSON.stringify(REPOS_WITH_BAD_SPELLINGS));
-
-
+		return fs.writeFileSync('./savedRepos.json',JSON.stringify(REPOS_WITH_BAD_SPELLINGS));
 });
 
 
@@ -44,11 +42,12 @@ function* fetchRepos(){
 	while(true){
 
 		yield new Promise((resolve,reject) => {
-
+			console.log('Promising some repos')
 			$.get({
 				url: 'https://api.github.com/repositories?since='+_ptr,
 				json: true,
 				done: (repos) => {
+					console.log('Got the repos, now to filter')
 					//Set the pointer to the new latest value
 					_ptr = repos[repos.length - 1].id;
 					resolve(repos);
@@ -74,12 +73,12 @@ function filterRepos(repoArr){
 	var _cbArr = [];
 
 	repoArr.forEach((repo) => {
-
 		//OoOoOo we're pushing in a function, JS is so cool
 		_cbArr.push((cb) => {
-
+			console.log('Fetching '+ repo.full_name);
 			$.get({
 				url: 'https://api.github.com/repos/' + repo.full_name,
+				json: true,
 				done: (repo) => {
 					if(repo.stargazers_count > 20){
 						cb(null,repo);
@@ -92,14 +91,18 @@ function filterRepos(repoArr){
 		});
 	});
 
-
 	return new Promise((resolve,reject) => {
-		async.parallel(_cbArr,(err,data) => {
+		async.waterfall(_cbArr,(err,data) => {
+			console.log('done waterfalling');
+			var repoArr = [];
 			data.forEach((repo) => {
 				if(repo){
 					console.log('Found repo '+repo.full_name);
+					repoArr.push(repo);
 				}
 			});
+			err
+			resolve(repoArr);
 		});
 
 
@@ -168,17 +171,13 @@ function grabReadMes(repos){
 	var _findRepo = fetchRepos();
 	var _finding = false;
 
-	//Repeats once every minute
-	setInterval(() => {
+	var _start = function(){
 
-		//Maybe a goto would be better than this whole setInterval + validation thing
-		if(!_finding){
-			
 			console.log('Eating some repos ... ');
-			_finding = true;
 
 			//Generate a repo promise, filter and grab the readme from that 
 			_findRepo.next().value.then((repos) => {
+				console.log('Fetched the Repos')
 				filterRepos(repos).then((fRepos) => {
 					readMe(fRepos,() => {
 						console.log('Finished eating a batch of repos, yum');
@@ -186,8 +185,20 @@ function grabReadMes(repos){
 					});
 				});
 			});
+
+	}
+	//Repeats once every minute
+	setInterval(() => {
+
+		//Maybe a goto would be better than this whole setInterval + validation thing
+		if(!_finding){
+			
+			_finding = true;
+			_start();
 		}
 
 	},120000);
-
+	_start();
 })();
+
+

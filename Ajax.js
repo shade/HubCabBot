@@ -1,10 +1,8 @@
 var request	=	require('request');
-
 function get(e,i){
 	i = i||1;
 	//Get rid of the self signed error 
 	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 	request({
 		url:e.url,
 		headers: {
@@ -40,4 +38,4 @@ function get(e,i){
 	
 }
 
-module.exports	=	get;
+module.exports	=	{get:get};
