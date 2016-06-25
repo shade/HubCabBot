@@ -1,5 +1,5 @@
 var fs = require('fs');
-var Async = require('async');
+var async = require('async');
 var ON_DEATH = require('DEATH');
 var $ = require('./Ajax');
 /*
@@ -80,11 +80,13 @@ function filterRepos(repoArr){
 				url: 'https://api.github.com/repos/' + repo.full_name,
 				json: true,
 				done: (repo) => {
-					if(repo.stargazers_count > 20){
-						cb(null,repo);
-					}else{
-						cb(null,undefined);
-					}
+					setTimeout(function(){
+						if(repo.stargazers_count > 20){
+							cb&&cb(null,repo);
+						}else{
+							cb&&cb(null,undefined);
+						}
+					},1000);
 				}
 			});
 
@@ -92,7 +94,7 @@ function filterRepos(repoArr){
 	});
 
 	return new Promise((resolve,reject) => {
-		async.waterfall(_cbArr,(err,data) => {
+		async.series(_cbArr,(err,data) => {
 			console.log('done waterfalling');
 			var repoArr = [];
 			data.forEach((repo) => {
