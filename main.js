@@ -1,5 +1,6 @@
+var fs = require('fs');
 var Git = require('nodegit');
-var SpellCheck = require('spellchecker')
+var SpellCheck = require('spellchecker');
 var Async = require('async');
 var ON_DEATH = require('DEATH');
 
@@ -20,6 +21,10 @@ var REPOS_WITH_BAD_SPELLINGS = [];
 
 //Since ^ is the most important thing
 
+ON_DEATH(function(){
+
+	fs.writeFileSync('./data.dat',REPOS_WITH_BAD_SPELLINGS);
+});
 
 
 
